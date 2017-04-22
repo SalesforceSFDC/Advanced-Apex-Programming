@@ -8,4 +8,12 @@ Apex constructs:
  * operators
  * variable declarations
  
+ Apex concepts:
+  * Execution Contexts
+  * Static Variables
+  * Bulk Patterns
+  * Limits
+  
+ 
+ 
 
