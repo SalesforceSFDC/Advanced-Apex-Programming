@@ -30,4 +30,12 @@ You know when the execution context starts.  Generally, cant know when it ends.
 
 An execution context begins when one of a number of possible external events or operations happen that have the ability to start running Apex code.  These include:
  * A database trigger: Triggers can occur on insertion, update, deletion or undeletion of many standard Salesforce objects and all custom objects.
- * Future call (asynchronous call): 
+ * Future call (asynchronous call): Future calls can be requested from Apex code.  They run with extended limits.
+ * Scheduled Apex: You can implement an Apex class that can be called by the system on a scheduled basis.
+ * Batch Apex: You can implement a class designed to process large numbers of database records.
+ * Web service: You can implement a class that can be accessed via SOAP or REST from an external site or from Javascript on a web page.
+ * Visualforce: Visualforce pages can execute Apex code in Visualforce controllers to retrieve or set page properties or execute methods.
+ * Global Apex: You can expose a global method that can be called from other Apex code.
+ * Anonymous Apex: Apex code can be compiled and executed dynamically from the developer console, Force.com IDE or through an external web service call.
+ 
+
