@@ -24,4 +24,6 @@ Static variables are maintained throughout an execution context, and are unique 
  
 Many (but not all) limits are reset between execution contexts.  For example, if governor limits restrict you to 100 database queries in an execution context, each execution context can have 100 database queries.  Different types of execution contexts may have different limits.
 
+You know when the execution context starts.  Generally, cant know when it ends.
+
 
