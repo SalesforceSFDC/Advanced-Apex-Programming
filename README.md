@@ -29,4 +29,5 @@ You know when the execution context starts.  Generally, cant know when it ends.
 ### Running Apex Code
 
 An execution context begins when one of a number of possible external events or operations happen that have the ability to start running Apex code.  These include:
- * 
+ * A database trigger: Triggers can occur on insertion, update, deletion or undeletion of many standard Salesforce objects and all custom objects.
+ * Future call (asynchronous call): 
