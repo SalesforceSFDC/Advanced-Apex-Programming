@@ -66,4 +66,4 @@ Static variables in Apex have execution context scope and lifetime.
 
  * Event handler is a callback routine that operates asynchronously and handles inputs received into a program (events).  In this context, an event is some meaningful element of application information from an underlying development framework, usually from a GUI toolkit or some kind of input routine.  
  * On the GUI side, events include key strokes, mouse activity, action selections, or timer expirations.  
- * On the input side, events include opening or closing 
+ * On the input side, events include opening or closing files and data streams, reading data, etc.
