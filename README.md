@@ -22,6 +22,11 @@ An execution context has two characteristics:
   * It defines the scope and lifetime of the static variables
   * It defines the context for those governor limits that are reset between execution contexts.
 
+Ramifications of the execution context:
+ * You can have multiple triggers on an event, but have no control over the order in which they execute.
+ * Limits are shared within an Execution Context, thus you may be sharing limits with other code over which you have no control and which may be added after yours is built and tested.
+ * 
+
 ### Static Variables
 
 Static variables are maintained throughout an execution context, and are unique to an execution context.
