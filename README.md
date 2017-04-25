@@ -48,5 +48,10 @@ An execution context begins when one of a number of possible external events or 
 if(!myclass.firstcall)
 {
   // First call into trigger
-  
+  myclass.firstcall = true;
+}
+else
+{
+  // Subsequent call into trigger
+}
 ```
