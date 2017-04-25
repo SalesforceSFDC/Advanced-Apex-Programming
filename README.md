@@ -60,3 +60,4 @@ else
   // Subsequent call into trigger
 }
 ```
+Static variables in Apex have execution context scope and lifetime.  
