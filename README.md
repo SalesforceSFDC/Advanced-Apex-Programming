@@ -25,7 +25,7 @@ An execution context has two characteristics:
 Ramifications of the execution context:
  * You can have multiple triggers on an event, but have no control over the order in which they execute.
  * Limits are shared within an Execution Context, thus you may be sharing limits with other code over which you have no control and which may be added after yours is built and tested.
- * 
+ * Workflows can impact the order and execution context in unpredictable ways.
 
 ### Static Variables
 
