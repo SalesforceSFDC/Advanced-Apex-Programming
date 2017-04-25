@@ -42,4 +42,11 @@ An execution context begins when one of a number of possible external events or 
  * Global Apex: You can expose a global method that can be called from other Apex code.
  * Anonymous Apex: Apex code can be compiled and executed dynamically from the developer console, Force.com IDE or through an external web service call.
  
-`public Static Boolean firstcall = false;` 
+`public Static Boolean firstcall = false;`  - Use the following design pattern in your trigger to determine if this was the first or subsequent call for this execution context 
+
+```Apex
+if(!myclass.firstcall)
+{
+  // First call into trigger
+  
+```
