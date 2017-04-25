@@ -61,3 +61,5 @@ else
 }
 ```
 Static variables in Apex have execution context scope and lifetime.  
+
+
