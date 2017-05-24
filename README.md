@@ -69,3 +69,6 @@ Static variables in Apex have execution context scope and lifetime.
  * On the input side, events include opening or closing files and data streams, reading data, etc.
 
 ### Trigger Patterns
+
+https://help.salesforce.com/articleView?id=000176390&type=1
+
