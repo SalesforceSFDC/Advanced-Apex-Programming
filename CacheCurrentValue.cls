@@ -8,4 +8,10 @@ public class ThinkingInApex {
   {
       if(IsUserSpecialChecked) return UserIsSpecial;
     
-      User u = [SELECT UserIsSpecial__c 
+      User u = [SELECT UserIsSpecial__c from User where ID 
+                = :UserInfo.getUserId()];
+      UserIsSpecial = u.UserIsSpecial__c;
+      IsUserSpecialChecked = true;
+      return UserIsSpecial;
+   }
+}
