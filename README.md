@@ -85,11 +85,11 @@ public class SomeFutureOperations {
   if(FutureCallCalled || 
    System.isFuture()) return;
   FutureCallCalled = true;
-  AcutalFutureCall();
+  ActualFutureCall();
  }
  
  @future
- private static void AcutalFutureCall()
+ private static void ActualFutureCall()
  
 ```
 
