@@ -6,4 +6,6 @@ public class ThinkingInApex {
   
   public static Boolean IsUserSpecial()
   {
-      
+      if(IsUserSpecialChecked) return UserIsSpecial;
+    
+      User u = [SELECT UserIsSpecial__c 
