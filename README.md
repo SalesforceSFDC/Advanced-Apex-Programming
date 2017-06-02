@@ -35,6 +35,8 @@ Many (but not all) limits are reset between execution contexts.  For example, if
 
 You know when the execution context starts.  Generally, cant know when it ends.
 
+ * Static variable's lifetime and scope is defined by the execution context.
+
 ### Running Apex Code
 
 An execution context begins when one of a number of possible external events or operations happen that have the ability to start running Apex code.  These include:
