@@ -15,3 +15,5 @@ public class ThinkingInApex {
       return UserIsSpecial;
    }
 }
+
+
