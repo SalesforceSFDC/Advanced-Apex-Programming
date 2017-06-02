@@ -90,7 +90,12 @@ public class SomeFutureOperations {
  
  @future
  private static void ActualFutureCall()
- 
+{
+  // Actual async code here
+  system.debug('ActualFutureCall async operation');
+  }
+  
+}
 ```
 
 ### Trigger Patterns
