@@ -76,6 +76,13 @@ Static variables in Apex have execution context scope and lifetime.
 * You can only make up to ten future calls from an execution context, and you cant make a future call from a future context.
 * In Apex, you have no way knowing that you are exiting the execution context.
 
+```Apex
+// indicates that the call has already been made
+public class SomeFutureOperations {
+ private static Boolean FutureCallCalled = false;
+ 
+```
+
 ### Trigger Patterns
 
 https://help.salesforce.com/articleView?id=000176390&type=1
