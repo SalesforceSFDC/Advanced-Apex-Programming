@@ -70,6 +70,10 @@ Static variables in Apex have execution context scope and lifetime.
  * On the GUI side, events include key strokes, mouse activity, action selections, or timer expirations.  
  * On the input side, events include opening or closing files and data streams, reading data, etc.
 
+### Future Calls
+
+* Future calls execute at some indeterminate time in the future, but because platform can schedule them based on server load, they are granted higher limits than other execution contexts, and are thus ideal for computationally intensive tasks.
+
 ### Trigger Patterns
 
 https://help.salesforce.com/articleView?id=000176390&type=1
