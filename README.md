@@ -73,6 +73,8 @@ Static variables in Apex have execution context scope and lifetime.
 ### Future Calls
 
 * Future calls execute at some indeterminate time in the future, but because platform can schedule them based on server load, they are granted higher limits than other execution contexts, and are thus ideal for computationally intensive tasks.
+* You can only make up to ten future calls from an execution context, and you cant make a future call from a future context.
+* In Apex, you have no way knowing that you are exiting the execution context.
 
 ### Trigger Patterns
 
