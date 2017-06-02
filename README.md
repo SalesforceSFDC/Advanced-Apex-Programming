@@ -80,6 +80,16 @@ Static variables in Apex have execution context scope and lifetime.
 // indicates that the call has already been made
 public class SomeFutureOperations {
  private static Boolean FutureCallCalled = false;
+ public static void DoFutureCall()
+ {
+  if(FutureCallCalled || 
+   System.isFuture()) return;
+  FutureCallCalled = true;
+  AcutalFutureCall();
+ }
+ 
+ @future
+ private static void AcutalFutureCall()
  
 ```
 
