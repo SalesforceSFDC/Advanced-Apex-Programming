@@ -29,4 +29,13 @@ public class ThinkingInApex {
     
     private static void CacheUserInfo()
     { 
-        
+        if(UserCahceLoaded) return;
+        User u = [SELECT UserIsSpecial__c,
+                  TimeZoneSidKey from User where
+                  ID = :UserInfo.getUserId()];
+        UserIsSpecial = u.UserIsSpecial__c;
+        UserTimeZone = u.TimeZoneSidKey;
+        UserCacheLoaded = true;
+    }
+    
+}
