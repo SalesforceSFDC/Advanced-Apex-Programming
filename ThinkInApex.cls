@@ -1,5 +1,7 @@
 /** With this approach, you can cache all necessary information from an object with only one SOQL call
+With this approach you can run into trouble if you try to cache large amount of data.
 **/
+
 public class ThinkingInApex {
 
     private static Boolean UserCacheLoaded = false;
