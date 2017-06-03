@@ -21,6 +21,7 @@ Apex concepts:
 An execution context has two characteristics:
   * It defines the scope and lifetime of the static variables
   * It defines the context for those governor limits that are reset between execution contexts.
+  * There is a limit to the size of memory heap you can use in an execution context.
 
 Ramifications of the execution context:
  * You can have multiple triggers on an event, but have no control over the order in which they execute.
