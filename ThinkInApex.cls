@@ -22,4 +22,11 @@ public class ThinkingInApex {
     
     private static void CacheUserInfo()
     {
+        if(UserCacheLoaded) return UserTimeZone;
+        CacheUserInfo();
+        return UserTimeZone;
+    }
+    
+    private static void CacheUserInfo()
+    { 
         
