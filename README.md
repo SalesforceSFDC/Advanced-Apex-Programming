@@ -102,3 +102,6 @@ public class SomeFutureOperations {
 ### Trigger Patterns
 
 https://help.salesforce.com/articleView?id=000176390&type=1
+
+
+### Testing, Debugging and Deployment
