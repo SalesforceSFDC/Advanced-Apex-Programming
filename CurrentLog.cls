@@ -17,3 +17,4 @@ public static String CurrentLog()
     }
     return result;
 }
+
