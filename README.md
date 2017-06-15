@@ -126,3 +126,6 @@ public static String CurrentLog()
     return result;
 }
 ```
+
+### Debuggin and Diagnostics
+
