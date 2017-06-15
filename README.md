@@ -154,3 +154,10 @@ During development, the easiest way to reproduce an error is using test classes.
    * When instructed to capture debug logs, the monitoring continues for a limited time or number of logs.  Continuous logging is possible for the current user using the Developer Console, though the number of logs kept is limited.
    * Debug logs are generated for a particular running user.
    * Debug logs do not capture detailed data from managed packages unless you are the package owner and log in via the Subscriber portal.
+
+Debug cycle:
+* Reproduce the error to obtain a log file and find a problem
+* Add some debugging code
+* Override the detail level of one or more classes so as not to exceed the max debug log size
+* Repeat
+
