@@ -140,4 +140,5 @@ Test-driven development environment.
 
 During development, the easiest way to reproduce an error is using test classes.
 
-* `SeeAllData` 
+* `SeeAllData` attribute on a test class to view or hide existing data in an org.  
+* Unlike test classes, anonymous Apex works on actual data.
