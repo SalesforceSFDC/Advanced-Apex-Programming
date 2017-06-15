@@ -105,3 +105,6 @@ https://help.salesforce.com/articleView?id=000176390&type=1
 
 
 ### Testing, Debugging and Deployment
+
+* You must have unit tests that cover at least 75% of your code to deploy software to production org.
+* 
