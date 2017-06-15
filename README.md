@@ -137,3 +137,5 @@ Test-driven development environment.
     * A way to modify the code to try different ways of solvign the problem
     
 * Diagnostics - capturing data about the operation of the software.
+
+During development, the easiest way to reproduce an error is using test classes.
