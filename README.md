@@ -108,3 +108,21 @@ https://help.salesforce.com/articleView?id=000176390&type=1
 
 * You must have unit tests that cover at least 75% of your code to deploy software to production org.
 * 
+
+```Apex
+public static String CurrentLog()
+{
+    if(DiagnosticLog == null) return null;
+    String spaces = '                       ';
+    String result = '';
+    for(DiagnosticEntry de: DiagnosticLog)
+    {
+        Integer endindex = 3 * de.level;
+        if(endindex >= spaces.length())
+            endindex = spaces.length()-1;
+        result += spaces.substring(0,endindex) +
+            de.description + '\n';
+    }
+    return result;
+}
+```
