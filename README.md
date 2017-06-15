@@ -161,3 +161,24 @@ Debug cycle:
 * Override the detail level of one or more classes so as not to exceed the max debug log size
 * Repeat
 
+The DiagnosticInstrumentation class starts by defining some static variables along with the DiagnosticEntry class that contains the current level and description of a diagnostic entry:
+
+```Apex
+public static Boolean DiagnosticEnabled = true;
+
+private static List<DiagnosticEntry> DiagnosticLog;
+private static Integer CurrentLevel = 0;
+
+private class DiagnosticEntry
+{
+  Integer level;
+  String description;
+  
+  public DiagnosticEntry(string entrydescription)
+  {
+    level = CurrentLevel;
+    description = entrydescription;
+  }
+}
+```
+
