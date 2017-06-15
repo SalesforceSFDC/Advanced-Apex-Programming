@@ -144,3 +144,9 @@ During development, the easiest way to reproduce an error is using test classes.
 * Unlike test classes, anonymous Apex works on actual data.
 * Breakpoints - 
 * Watchpoints - 
+
+* The primary source for capturing runtime data from Apex are the debug logs.  The debug logs have the following characteristics:
+   * They are limited in size.
+   * You can control the level of detail of the data you are capturing at the class level.  Capture enough detail and you can view the values of variables - but you are more likely to exceed the max log size.
+   * You can use the System.debug statement to add debug data to the log.  Those statements can hard to find in large debug logs.
+   * 
