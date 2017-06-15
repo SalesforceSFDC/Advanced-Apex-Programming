@@ -149,4 +149,8 @@ During development, the easiest way to reproduce an error is using test classes.
    * They are limited in size.
    * You can control the level of detail of the data you are capturing at the class level.  Capture enough detail and you can view the values of variables - but you are more likely to exceed the max log size.
    * You can use the System.debug statement to add debug data to the log.  Those statements can hard to find in large debug logs.
-   * 
+   * The Developer Console has the ability to extract and organize data from the debug logs, but only if the debug logs dont exceed a certain size.
+   * The platform stores only a limited number of debug logs.
+   * When instructed to capture debug logs, the monitoring continues for a limited time or number of logs.  Continuous logging is possible for the current user using the Developer Console, though the number of logs kept is limited.
+   * Debug logs are generated for a particular running user.
+   * Debug logs do not capture detailed data from managed packages unless you are the package owner and log in via the Subscriber portal.
