@@ -139,3 +139,5 @@ Test-driven development environment.
 * Diagnostics - capturing data about the operation of the software.
 
 During development, the easiest way to reproduce an error is using test classes.
+
+* `SeeAllData` 
