@@ -127,10 +127,13 @@ public static String CurrentLog()
 }
 ```
 
-### Debuggin and Diagnostics
+### Debugging and Diagnostics
 
 Test-driven development environment.
 
 * Debugging is the process of figuring out why software is working incorrectly and fixing the problem.  To debug software you want to have the following:
     * A way to reproduce the problem
-    * 
+    * A way to capture data about the problem
+    * A way to modify the code to try different ways of solvign the problem
+    
+* Diagnostics - capturing data about the operation of the software.
