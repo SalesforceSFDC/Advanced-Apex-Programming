@@ -183,3 +183,5 @@ private class DiagnosticEntry
 ```
 
 The DiagnosticEnabled flag makes it possible to enable or disable the diagnostic system.  This is important because the diagnostics code does use script lines, and in later implementations, performs SOQL and DML calls as well.  Disable the diagnostics in cases where limits are an issue.
+
+
