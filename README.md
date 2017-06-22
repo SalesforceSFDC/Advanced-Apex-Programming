@@ -206,4 +206,7 @@ private class Benchmarking {
     }
 }
 ```
+## Bulk Patterns
+
 * Salesforce does not support triggers on the `OpportunityContactRole` object.
+* Test-driven design methodology.
