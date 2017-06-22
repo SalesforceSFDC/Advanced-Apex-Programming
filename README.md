@@ -183,3 +183,26 @@ private class DiagnosticEntry
 ```
 
 The DiagnosticEnabled flag makes it possible to enable or disable the diagnostic system.  This is important because the diagnostics code does use script lines, and in later implementations, performs SOQL and DML calls as well.  Disable the diagnostics in cases where limits are an issue.
+
+### Benchmarking
+
+* Place the operation you want to measure inside of the loop, perform the operation multiple times, then divide the time spent by the number of iterations.
+
+```Apex
+@isTest
+private class Benchmarking {
+	
+    @istest
+    public static void TestNewAllocate()
+    {
+        for(Integer x = 0; x < 10000; x++)
+            ReturnNewMap();
+    }    
+    
+    private static Map<Integer,String> ReturnNewMap()
+    {
+        Map<Integer,String> result = new Map<Integer,String>();
+        return result;
+    }
+}
+```
