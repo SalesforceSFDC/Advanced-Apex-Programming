@@ -210,3 +210,8 @@ private class Benchmarking {
 
 * Salesforce does not support triggers on the `OpportunityContactRole` object.
 * Test-driven design methodology.
+Test goals: 
+	* Does the code work?
+	* Obtaining code coverage
+	* Handling invalid input
+	* 
