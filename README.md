@@ -206,3 +206,4 @@ private class Benchmarking {
     }
 }
 ```
+* Salesforce does not support triggers on the `OpportunityContactRole` object.
