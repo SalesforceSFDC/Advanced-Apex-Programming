@@ -1,0 +1,101 @@
+trigger CommunityUserBeforeTriggerClonned on Li_Community_User1__c (before insert, before update) {
+    Map<String, Li_Community_User1__c> emailToCommunityUserMap = new Map<String, Li_Community_User1__c>();
+    Map<String, Contact> emailToContactMap = new Map<String, Contact>();
+    List<Li_Community_User1__c> listOfCommunityUsers = new List<Li_Community_User1__c>();
+    List<Contact> contactsToInsert = new List<Contact>();
+    LithiumSettings1__c liSetting = LithiumSettings1__c.getValues('DefaultSetting');
+    
+    if(liSetting == NULL) {
+        liSetting = new LithiumSettings1__c();
+        liSetting.Name = 'DefaultSetting';
+        liSetting.Sync_With_Contact__c = true;
+        liSetting.Create_New_Contact_record__c = true;
+        
+        Database.insert(liSetting);
+    }
+    
+    for(Li_Community_User1__c aCommunityUser : trigger.new) {
+        if(aCommunityUser.Email_Address__c != NULL)
+            emailToCommunityUserMap.put((aCommunityUser.Email_Address__c).trim().tolowercase(), aCommunityUser); // build a map of email>community user
+    }
+    //change comments after first run
+    List<Contact> cntcts = new List<contact>();
+    set<string> stEmail = new set<string>();
+    for(contact c: [SELECT Id,account.ownerid, account.owner.isactive, FirstName, LastName, Name,LithiumId__c, Email FROM Contact WHERE Email IN :emailToCommunityUserMap.keySet() and LithiumId__c != null])
+    {
+        cntcts.add(c);
+        stEmail.add(String.valueOf(c.Email).trim().tolowercase());
+    }
+    for(contact c: [SELECT Id,account.ownerid, account.owner.isactive, FirstName, LastName, Name,LithiumId__c, Email FROM Contact WHERE Email IN :emailToCommunityUserMap.keySet() and LithiumId__c = null])
+    {
+        if(!stEmail.contains(String.valueOf(c.Email).trim().tolowercase()))
+        {
+            cntcts.add(c);
+            stEmail.add(String.valueOf(c.Email).trim().tolowercase());
+        }
+    }
+    //List<Contact> cntcts = [SELECT Id, FirstName, LastName, LithiumId__c , Name, Email FROM Contact WHERE Email IN :emailToCommunityUserMap.keySet()];
+    //first run ends
+    
+    for(Contact aContact1 : cntcts) {
+         if(!emailToContactMap.containsKey(aContact1.Email)){
+                emailToContactMap.put(String.valueOf(aContact1.Email).trim().tolowercase(), aContact1);  // build a map of email>contact (Contacts which have same email as community users)
+            }
+    }    
+    List<contact> lstCon = new List<contact>();
+    for(String usr_email : emailToCommunityUserMap.keySet()) { // loop through all community users with email address
+        usr_email = usr_email.trim().tolowercase();
+        Contact aContact = emailToContactMap.get(usr_email);
+        
+        Li_Community_User1__c aCommunityUser = emailToCommunityUserMap.get(usr_email);
+        if(aContact != NULL && liSetting.Sync_With_Contact__c){ // attach Contact record or not
+            aCommunityUser.Contact__c = aContact.Id; // use existing contact
+            if(aContact.account != null && aContact.account.owner.isactive == true && aContact.account.ownerId != null){
+                aCommunityUser.ownerid = aContact.account.ownerId;
+            }
+            //Comment after first run
+            //if(aContact.LithiumId__c == null)
+            //lstCon.add(new contact(id=aContact.Id,LithiumId__c = aCommunityUser.Lithium_User_Id__c));
+            //Comment ends
+        }
+        if(aContact == NULL && liSetting.Create_New_Contact_record__c) { // contact doesn't exist and lithium setting asks to create one
+            if(aCommunityUser != null && aCommunityUser.name != null && !aCommunityUser.name.Startswith('a4m')){
+                aContact = new Contact(); // No contact exists; create new record
+                aContact.ownerid      = '005C0000006hBOnIAM';
+                aContact.FirstName    = aCommunityUser.First_Name__c;
+                aContact.LastName     = (aCommunityUser.Last_Name__c == NULL)?aCommunityUser.Name:aCommunityUser.Last_Name__c; // LastName is required for Contact; making sure it is not empty
+                aContact.Email        = aCommunityUser.Email_Address__c;
+                aContact.LithiumId__c = aCommunityUser.Lithium_User_Id__c;
+                contactsToInsert.add(aContact); // list of contacts to update/insert
+                listOfCommunityUsers.add(aCommunityUser); // maintain a list of community users also; same order as contactsToInsert
+            }
+        }           
+    }
+    //Comment after first run
+    /*if(lstCon != null && lstCon.size() > 0)
+    {
+       update lstCon;
+    }*/
+    //Comment ends
+    if(!contactsToInsert.isEmpty()) {
+        try{
+            Database.SaveResult[] iResults = Database.insert(contactsToInsert, false); // insert/update contacts; continue DML operations if a failure occurs
+            Integer i = 0;
+            for(Database.SaveResult result : iResults) {
+                // Database.SaveResult[] in same order as contactsToInsert
+                // Safe to assume same index for community users list
+                if(!result.isSuccess()) { // error occured in contact update/insert
+                    system.debug('error updating ' + result.getErrors()[0].getMessage());
+                    listOfCommunityUsers[i].addError('Error creating/updating Contact'); // add error to community user object;
+                }
+                else if(liSetting.Sync_With_Contact__c){  // attach new Contact record or not
+                    listOfCommunityUsers[i].Contact__c = result.getId(); // assign contact id; this is not available before contact is inserted, hence done here
+                } 
+                ++i;
+            }
+        }catch(Exception e){
+            system.debug('Catched the exception while inserting/updating contact');
+        }
+        
+    }   
+}

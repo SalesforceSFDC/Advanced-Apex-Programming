@@ -1,0 +1,38 @@
+trigger LeadTrigger on Lead (before insert, before update) 
+{
+	List<Lead> records = trigger.isDelete ? trigger.old : trigger.new;
+
+	if(trigger.isBefore)
+	{
+		if(trigger.isInsert)
+		{
+			ULead.runRules(records, trigger.oldMap);
+		}
+		else if(trigger.isUpdate)
+		{
+			ULead.runRules(records, trigger.oldMap);
+		}
+		//else if(trigger.isDelete)
+		//{
+		//}
+	} 
+	    
+	//else 
+	/*
+	if(trigger.isAfter)
+	{
+		if(trigger.isInsert)
+		{
+		}
+		else if(trigger.isUpdate)
+		{
+		}
+		else if(trigger.isDelete)
+		{		   
+		}
+		else if(trigger.isUndelete)
+		{	  
+		}
+	}
+	*/
+}

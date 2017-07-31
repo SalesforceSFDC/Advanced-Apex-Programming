@@ -1,0 +1,162 @@
+trigger CommunityUserBeforeTriggerCreateLead on Li_Community_User1__c (before insert, before update) {
+
+    Map<String, Li_Community_User1__c> emailToCommunityUserMap = new Map<String, Li_Community_User1__c>();
+    Map<String, Lead> emailToLeadMap = new Map<String, Lead>();
+    Map<String, Contact> emailToContactMap = new Map<String, Contact>();
+    List<Li_Community_User1__c> listOfCommunityUsers = new List<Li_Community_User1__c>();
+    List<Lead> leadsToInsert = new List<Lead>();
+    LithiumSettings1__c liSetting = LithiumSettings1__c.getValues('DefaultSetting');
+    
+    if(liSetting == NULL) {
+        liSetting = new LithiumSettings1__c();
+        liSetting.Name = 'DefaultSetting';
+        liSetting.Sync_With_Contact__c = true;
+        liSetting.Create_New_Contact_record__c = true;        
+        Database.insert(liSetting);
+    }
+    
+    System.debug('__liSetting___'+liSetting);
+    
+    for(Li_Community_User1__c aCommunityUser : trigger.new) {
+        if(aCommunityUser.Email_Address__c != NULL)
+            emailToCommunityUserMap.put((aCommunityUser.Email_Address__c).trim().tolowercase(), aCommunityUser); // build a map of email>community user
+    }
+    
+    System.debug('__emailToCommunityUserMap___'+emailToCommunityUserMap);
+    
+    //change comments after first run
+    /*List<Lead> cntLds = new List<Lead>();
+    set<string> stEmail = new set<string>();
+    
+    for(Lead c: [SELECT Id,FirstName, LastName, Name, LithiumId__c, Email, OwnerId, Owner.isActive  FROM Lead WHERE IsConverted = FALSE AND  Email IN :emailToCommunityUserMap.keySet() and LithiumId__c != null])
+    {
+        cntLds.add(c);
+        stEmail.add(String.valueOf(c.Email).trim().tolowercase());
+    }
+    
+    for(Lead c: [SELECT Id,FirstName, LastName, Name,LithiumId__c, Email, OwnerId, Owner.isActive FROM Lead WHERE IsConverted = FALSE AND Email IN : emailToCommunityUserMap.keySet() and LithiumId__c = null])
+    {
+        if(!stEmail.contains(String.valueOf(c.Email).trim().tolowercase()))
+        {
+            cntLds.add(c);
+            stEmail.add(String.valueOf(c.Email).trim().tolowercase());
+        }
+    }
+    //List<Contact> cntcts = [SELECT Id, FirstName, LastName, LithiumId__c , Name, Email FROM Contact WHERE Email IN :emailToCommunityUserMap.keySet()];
+    //first run ends
+    
+    for(Lead aLead1 : cntLds) {
+        if(!emailToLeadMap.containsKey(aLead1.Email)){
+            emailToLeadMap.put(String.valueOf(aLead1.Email).trim().tolowercase(), aLead1);  // build a map of email>contact (Contacts which have same email as community users)
+        }
+    } */
+    
+    /*************************************EMAIL TO LEAD MAP************************************/
+    for(Lead c : [SELECT Id,owner.profileid,FirstName,isconverted, LastName, Name, LithiumId__c, Email, OwnerId, Owner.isActive FROM Lead WHERE IsConverted = FALSE AND Email IN :emailToCommunityUserMap.keySet()]){
+        emailToLeadMap.put(String.valueOf(c.Email).trim().tolowercase(), c); 
+    }
+    
+    /*******************************EMAIL TO CONTACT MAP**************************************/
+    for(Contact c : [SELECT Id,owner.profileid,FirstName, LastName, Name, LithiumId__c, Email, OwnerId, Owner.isActive FROM Contact WHERE Email IN :emailToCommunityUserMap.keySet()]){
+        emailToContactMap.put(String.valueOf(c.Email).trim().tolowercase(), c); 
+    }
+    
+    //List<Lead> lstCon = new List<Lead>();
+    Set<ID> profilesIDWithPermissions = new Set<ID>();
+    for(permissionset ps : [select id, name, Profile.Name,Profile.id, (SELECT Id, SObjectType, PermissionsRead FROM ObjectPerms where SObjectType='Li_Community_User1__c') from permissionset where PermissionSet.Profile.Name!=null]){
+        System.debug('_____ps.Profile.Name___'+ps.ObjectPerms);
+        
+        if(ps.ObjectPerms != null && !ps.ObjectPerms.isEmpty()){
+            System.debug('___has_value__');
+            profilesIDWithPermissions.add(ps.Profile.id);
+        }
+    }
+    System.debug('___profilesIDWithPermissions____'+profilesIDWithPermissions);
+    
+    for(String usr_email : emailToCommunityUserMap.keySet()) { // loop through all community users with email address
+    
+        System.debug('__inside_for_loop__');
+        usr_email = usr_email.trim().tolowercase();
+        Lead aLead = emailToLeadMap.get(usr_email);
+        Contact aContact = emailToContactMap.get(usr_email);
+        
+        Li_Community_User1__c aCommunityUser = emailToCommunityUserMap.get(usr_email);
+        
+        /***************LEAD ALREADY EXISTS**************/
+        if(aLead != NULL && liSetting.Sync_With_Contact__c){ // attach Lead record
+            System.debug('__lead_already_exists___just_attach_it_'+'___Profileid___'+aLead.owner.profileid);
+            aCommunityUser.Lead__c = aLead.Id; // use existing Lead
+            if(aLead.ownerId != null && aLead.owner.isactive == true && String.valueOf(aLead.id.getSObjectType()) == 'User' && profilesIDWithPermissions.contains(aLead.owner.profileid)){
+                system.debug('___reached__LEad');
+                aCommunityUser.ownerid = aLead.ownerId;
+            }
+            //Comment after first run
+            //if(aContact.LithiumId__c == null)
+            //lstCon.add(new contact(id=aContact.Id,LithiumId__c = aCommunityUser.Lithium_User_Id__c));
+            //Comment ends
+        }
+        /***************IF LEAD DOES NOT EXISTS THN CONTACT MIGHT EXISTS************/
+        else if(aContact != null){ // attach Lead record
+            System.debug('__lead_is_converted_or_lead_does_not_exist_attach_contact__'+aContact+'___Profileid___'+aContact.owner.profileid);
+            aCommunityUser.contact__c = aContact.Id; // use existing Lead
+            if(aContact.ownerId != null && aContact.owner.isactive == true && profilesIDWithPermissions.contains(aContact.owner.profileid)){
+                system.debug('___reached__contact');
+                aCommunityUser.ownerid = aContact.ownerId;
+            }
+        }
+        /****************IF NITHER LEAD EXISTS AND NOE CONTACT THEN CREATE LEAD***************/
+        else if(aLead == NULL && aContact == null && liSetting.Create_New_Contact_record__c) { // Lead/Contact doesn't exist and lithium setting asks to create one
+            System.debug('1___'+aCommunityUser+'__2____'+aCommunityUser.name);
+            //if(aCommunityUser != null && aCommunityUser.name != null && !aCommunityUser.name.Startswith('a4m')){
+            if(aCommunityUser != null){   
+                System.debug('__inside_creation_of_new_leads___');
+                aLead = new Lead(); // No Lead exists; create new record
+                aLead.ownerid      = '005C0000006hBOnIAM';
+                if(aCommunityUser.First_Name__c != null)
+                    aLead.FirstName    = aCommunityUser.First_Name__c;  
+                // LastName is required for Lead; making sure it is not empty
+                if(aCommunityUser.Last_Name__c == NULL){
+                    aLead.LastName = 'Unknown';
+                    aLead.LeadSource = 'Website';
+                    aLead.Lead_Source_Category__c = 'Create Account'; 
+                    aLead.Lead_Source_Subcategory__c = 'Optiverse';
+                }else
+                    aLead.LastName = aCommunityUser.Last_Name__c; 
+                aLead.Email        = aCommunityUser.Email_Address__c;
+                aLead.LithiumId__c = aCommunityUser.Lithium_User_Id__c;
+                if(aCommunityUser.company__c != null)
+                    aLead.company = aCommunityUser.company__c;
+                else
+                    aLead.company = 'N/A';
+                LeadsToInsert.add(aLead); // list of Lead to update/insert
+                listOfCommunityUsers.add(aCommunityUser); // maintain a list of community users also; same order as LeadsToInsert
+            }
+        }
+    }
+    //Comment after first run
+    /*if(lstCon != null && lstCon.size() > 0)
+    {
+       update lstCon;
+    }*/
+    //Comment ends
+    if(!LeadsToInsert.isEmpty()) {
+        try{
+            Database.SaveResult[] iResults = Database.insert(leadsToInsert, false); // insert/update Leads; continue DML operations if a failure occurs
+            Integer i = 0;
+            for(Database.SaveResult result : iResults) {
+                // Database.SaveResult[] in same order as leadsToInsert
+                // Safe to assume same index for community users list
+                if(!result.isSuccess()) { // error occured in lead update/insert
+                    system.debug('error updating ' + result.getErrors()[0].getMessage());
+                    listOfCommunityUsers[i].addError('Error creating/updating Lead'); // add error to community user object;
+                }
+                else if(liSetting.Sync_With_Contact__c){  // attach new lead record or not
+                    listOfCommunityUsers[i].Lead__c = result.getId(); // assign lead id; this is not available before lead is inserted, hence done here
+                } 
+                ++i;
+            }
+        } catch(Exception e) {
+            system.debug('Catched the exception while inserting/updating Lead');
+        }        
+    }   
+}

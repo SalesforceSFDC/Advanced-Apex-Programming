@@ -1,0 +1,48 @@
+trigger SubscriptionProductUserLeadConvert on Lead (before update) {
+
+	// create mapping of Lead Id to Contact Id
+	Map<Id, Id> mapLeadIdContactId = new Map<Id, Id>();
+	// create mapping of Lead Id to Account Id
+	Map<Id, Id> mapLeadIdAccountId = new Map<Id, Id>();
+
+	// add the Lead Id:Contact Id pair to the mapping above for each Lead converted into a Contact
+	for (Lead l : Trigger.new) {
+		if (l.isConverted) { 
+			mapLeadIdContactId.put(l.Id, l.convertedContactId);
+			mapLeadIdAccountId.put(l.Id, l.convertedAccountId); 
+			}
+		/*if (l.isConverted && l.convertedAccountId != null) {
+			mapLeadIdAccountId.put(l.Id, l.convertedAccountId);
+			}*/
+		}
+
+	// store a list of Product User records, including the Subscription Account Id, looking up to a Lead stored in the Lead:Contact mapping
+	List<Product_User__c> listProductUser = [SELECT Lead__c, Contact__c, Subscription__c, Subscription__r.Account__c, External_Id__c
+											 FROM Product_User__c 
+											 WHERE Lead__c IN :mapLeadIdContactId.keySet()];
+
+	Map<Id, Subscription__c> subscriptionMap = new Map<Id, Subscription__c>();
+	// iterate through all Product User records that lookup to a Lead
+	for (Product_User__c p : listProductUser) {
+		p.Contact__c = mapLeadIdContactId.get(p.Lead__c); 
+		if (String.isBlank(p.Subscription__r.Account__c)) {
+			Subscription__c subscription = new Subscription__c(
+				Id = p.Subscription__c,
+				Account__c = mapLeadIdAccountId.get(p.Lead__c));
+			subscriptionMap.put(subscription.Id, subscription);
+		}
+
+	}
+
+	List<Subscription__c> listSubscriptions = subscriptionMap.values();
+	try {
+		update listSubscriptions;
+	}
+	catch (DmlException dmx)
+	{
+		// always handle DML Exceptions on cross object updates from a trigger
+	}
+
+	update listProductUser;
+
+}

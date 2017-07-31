@@ -1,0 +1,46 @@
+/*
+    Name: ContactTrigger
+    Created By: Raja Yeccherla(GearsCRM)
+    Created Date: 06/22/2016
+    Description: Trigger for Contact
+    
+    Modified By: 
+    Modified Date:  
+    Description:   
+*/
+trigger ContactTrigger on contact (after insert, after update) {
+ 
+    List<contact> records = trigger.isDelete ? trigger.old :trigger.new;
+    
+    /*if(trigger.isBefore)
+    {
+        if(trigger.isInsert)
+        {
+        }
+        else if(trigger.isUpdate)   
+        {
+        }
+        else if(trigger.isDelete)
+        {     
+        }   
+    }
+    else if(trigger.isAfter)*/    
+  
+    if(trigger.isafter )  
+    {
+        if(trigger.isInsert) 
+        {
+            UContact.setAccountTeamMember4(records, trigger.oldMap); 
+        } 
+        else if(trigger.isUpdate)
+        {
+            UContact.setAccountTeamMember4(records, trigger.oldMap);    
+        }
+        /*else if(trigger.isDelete)
+        {
+        }
+        else if(trigger.isUndelete)
+        {
+        } */ 
+    } 
+}

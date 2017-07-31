@@ -1,0 +1,42 @@
+trigger UpdateCommunityUserRoles on Account (after Update) {
+
+    Map<String,Account> qualifiedAccounts = new Map<String,Account>();
+    
+    if(Trigger.isUpdate && Trigger.isAfter){
+        
+        for(Account acc : Trigger.new){              
+              system.debug('__old___'+Lithium_Roles_With_IDs__c.getAll().containskey(Trigger.oldMap.get(acc.id).Market_Segment__c));
+              system.debug('__new___'+Lithium_Roles_With_IDs__c.getAll().containskey(acc.Market_Segment__c));
+                
+              if(!qualifiedAccounts.containsKey(String.valueOf(acc.id).substring(0,15)) && acc.Market_Segment__c != null && (Trigger.oldMap.get(acc.id).Market_Segment__c == null || 
+                !Lithium_Roles_With_IDs__c.getAll().containskey(Trigger.oldMap.get(acc.id).Market_Segment__c)) && (Lithium_Roles_With_IDs__c.getAll().containskey(acc.Market_Segment__c))){
+                    qualifiedAccounts.put(String.valueOf(acc.id).substring(0,15),acc);
+                }
+        } 
+        
+        Map<String, Lithium_Roles_With_IDs__c> allRoles = Lithium_Roles_With_IDs__c.getAll();
+        Map<String, Lithium_Roles_With_IDs__c> rolesIDs = new Map<String, Lithium_Roles_With_IDs__c>();
+        
+        for(Lithium_Roles_With_IDs__c role : allRoles.values()) {
+            rolesIDs.put(role.name, role);
+        }
+        
+        System.debug('__qualifiedAccounts___'+qualifiedAccounts);
+        
+        if(!qualifiedAccounts.isEmpty()){
+            
+            List<Li_Community_User1__c> commUsersWithRelatedAccount = [SELECT id,Lithium_User_Id__c,Account_ID__c FROM Li_Community_User1__c WHERE Contact__r.AccountId =: qualifiedAccounts.keyset()];
+            for(Li_Community_User1__c cm : commUsersWithRelatedAccount){
+                if(cm.Account_ID__c != null){
+                 if(qualifiedAccounts.get(cm.Account_ID__c) !=null){
+                    System.debug('__userid___'+cm.Lithium_User_Id__c);
+                    System.debug('___market_segment___'+rolesIDs.get(qualifiedAccounts.get(cm.Account_ID__c).market_segment__c).role_id__c);
+                    Lithium_Revised_ConnectorUtils.sendAPIRequestV1UpdateUser(cm.Lithium_User_Id__c,rolesIDs.get(qualifiedAccounts.get(cm.Account_ID__c).market_segment__c).role_id__c);
+                  }
+                }
+            }
+            
+            System.debug('___commUsersWithRelatedAccount___'+commUsersWithRelatedAccount);
+        }
+    }    
+}

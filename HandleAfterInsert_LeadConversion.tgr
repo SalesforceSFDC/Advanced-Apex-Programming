@@ -1,0 +1,28 @@
+trigger HandleAfterInsert_LeadConversion on Contact (after insert) {    
+
+    if(LithiumRecursionController.HandleAfterInsert_LeadConversion == true)
+        return;
+    LithiumRecursionController.HandleAfterInsert_LeadConversion = true;
+    
+    Map<Integer,Id> mapLithmIdToCntcs = new Map<Integer,Id>();
+    List<Li_Community_User1__c> updLiCmmUsrs = new List<Li_Community_User1__c>();
+    
+    for(Contact aContact : Trigger.new) {
+        System.debug('___lithiumid___'+aContact.LithiumId__c);
+        if(aContact.LithiumId__c != NULL) {
+            mapLithmIdToCntcs.put(Integer.valueOf(aContact.LithiumId__c),aContact.Id);
+        }
+    }
+    
+    System.debug('___mapLithmIdToCntcs____'+mapLithmIdToCntcs);
+
+    for(Li_Community_User1__c aCommunityUser : [SELECT Id,Contact__c,Lithium_User_Id__c from Li_Community_User1__c Where Lithium_User_Id__c != NULL AND Lithium_User_Id__c IN : mapLithmIdToCntcs.keySet()]) {
+        if(mapLithmIdToCntcs.containsKey(Integer.valueOf(aCommunityUser.Lithium_User_Id__c))) {
+            System.debug('____contact_id____'+mapLithmIdToCntcs.get(Integer.valueOf(aCommunityUser.Lithium_User_Id__c)));
+            aCommunityUser.Contact__c = mapLithmIdToCntcs.get(Integer.valueOf(aCommunityUser.Lithium_User_Id__c));
+            updLiCmmUsrs.Add(aCommunityUser);    
+        }
+    }
+    System.debug('___updLiCmmUsrs____'+updLiCmmUsrs);
+    update updLiCmmUsrs;
+}

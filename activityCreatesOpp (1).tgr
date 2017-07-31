@@ -1,0 +1,54 @@
+trigger activityCreatesOpp on Opportunity (after insert) {
+
+	// create set of Activity Ids that are Events; create map of Activity Id to Event
+	set<Id> eventIds = new set<Id>();
+	map<Id, Event> eventMap = new map<Id, Event>();
+	// create set of Activity Ids that are Tasks; create map of Activity Id to Task
+	set<Id> taskIds = new set<Id>();
+	map<Id, Task> taskMap = new map<Id, Task>();
+
+	// If the Activity Id on the opp is an Event or Task, add it to the appropriate set
+	for(Opportunity opp : Trigger.new) {
+		String actId = opp.ActivityId__c;
+		if(String.isNotBlank(actId) && actId.startsWith('00U')) {
+			eventIds.add(opp.ActivityId__c);
+		}
+		if(String.isNotBlank(actId) && actId.startsWith('00T')) {
+			taskIds.add(opp.ActivityId__c);
+		}	
+	}
+    
+    // If there are any Events that led to opp creation, create a mapping pair
+    if(eventIds.size() > 0) {
+    	for(Event e : [SELECT Id from Event WHERE Id IN :eventIds]) {
+    		eventMap.put(e.Id, e);	
+    	}
+    }
+
+    // If there are any Tasks that led to opp creation, create a mapping pair
+    if(taskIds.size() > 0) {
+    	for(Task t : [SELECT Id from Task WHERE Id IN :taskIds]) {
+    		taskMap.put(t.Id, t);
+    	}
+	}
+    
+    // changes the WhatId to the Opportunity Id on any Events or Tasks that are referenced on the Opportunity
+	for(Opportunity opp : Trigger.new) {
+		if(eventMap.containsKey(opp.ActivityId__c)) {
+			eventMap.get(opp.ActivityId__c).WhatId = opp.Id;
+		}	
+		if(taskMap.containsKey(opp.ActivityId__c)) {
+			taskMap.get(opp.ActivityId__c).WhatId = opp.Id;
+		}
+	}
+
+	// update the Events or Tasks that created an Opportunity
+	if(eventMap.size() > 0) {
+		update eventMap.values();
+	}
+	if(taskMap.size() > 0) {
+		update taskMap.values();
+	}
+
+
+}

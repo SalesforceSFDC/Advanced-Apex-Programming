@@ -1,0 +1,12 @@
+trigger SpringCMAccount on Account (after insert) {
+    Map<ID, Schema.RecordTypeInfo> rtMap = Schema.SObjectType.Account.getRecordTypeInfosById();
+    Map<String, String> acc = new Map<String, String>();
+
+    for(Account a : Trigger.new) {
+        String recordType = null;
+        if(rtMap.size() > 1)
+            recordType = rtMap.get((ID)a.get('RecordTypeId')).getName();
+        acc.put(a.Id, recordType);
+        }
+    SpringCMRestWrap.BuildEOS(acc, 'Account', UserInfo.getSessionId(), 'CreateSubFolderStructure_CSV');
+    }
